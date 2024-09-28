@@ -1,0 +1,2 @@
+# supabase-experiment
+Supabaseの機能を実験的に実装するサンドボックス的リポジトリ
