@@ -4,5 +4,14 @@
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
-  "remoteUser": "node"
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"files.associations": {
+					"*.css": "tailwindcss"
+				}
+			}
+		}
+	},
+	"remoteUser": "node"
 }
