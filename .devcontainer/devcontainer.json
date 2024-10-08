@@ -10,7 +10,10 @@
 				"files.associations": {
 					"*.css": "tailwindcss"
 				}
-			}
+			},
+			"extensions": [
+				"GitHub.copilot"
+			]
 		}
 	},
 	"remoteUser": "node"

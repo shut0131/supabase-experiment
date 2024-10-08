@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client'
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <div className="flex justify-center items-center min-h-screen">
+      <div>
         <App />
       </div>
     </StrictMode>

@@ -1,15 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import './App.css'
 import { client } from "./supabse"
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { Player } from './types'
+import { FormInputPlayerName } from './components/FormInputPlayerName'
+import { WaitingOtherMember } from './components/WaitingOtherMember'
 
-let initilized = false
 
-const copyToClipboard = (text: string) => {
-  navigator.clipboard.writeText(text)
-}
 
 function App() {
 
@@ -18,13 +16,10 @@ function App() {
   const [player, setPlayer] = useState<Player | undefined>(undefined)
   const [players, setPlayers] = useState<Player[]>([])
 
-  const [initializeStatus, setInitializeStatus] = useState<"initializing" | "failed" | "ok">("initializing")
+  const [status, setStatus] = useState<"inputPlayerName" | "joiningTheRoom" | "waitingOtherPlayers" >("inputPlayerName")
 
-  useEffect(() => {
-    if (channel || initilized) return
-
-    initilized = true
-
+  const joinRoom = (playerName: string) => {
+    setStatus("joiningTheRoom")
     const url = new URL(window.location.href)
     const roomIdFromParam = url.searchParams.get('room_id')
     const isHost = Boolean(roomIdFromParam)
@@ -35,11 +30,6 @@ function App() {
     const roomOne = client.channel(roomId)
     setChannel(roomOne)
 
-
-    let playerName = window.prompt('プレイヤー名を入力してください')
-    while (!playerName || !playerName.trim()) {
-      playerName = window.prompt('プレイヤー名は必須です')
-    }
     const player = { id: crypto.randomUUID(), name: playerName, isHost }
     setPlayer(player)
 
@@ -54,33 +44,31 @@ function App() {
       .subscribe(async (status) => {
         if (status !== 'SUBSCRIBED') {
           console.error('Failed to subscribe', status)
+          // TODO: handle error
           return
         }
 
         const presenceTrackStatus = await roomOne.track({ data: player })
         if (presenceTrackStatus !== "ok") {
+          // TODO: handle error
           console.error('Failed to track', presenceTrackStatus)
-
+        }else{
+          setStatus("waitingOtherPlayers")
         }
       })
-
-
-
-  }, [])
-
-
-  if(initializeStatus === "initializing"){
-    return <span className="loading loading-dots loading-lg"></span>
   }
-  
+
+  if(status === "waitingOtherPlayers"){
+    return (<WaitingOtherMember players={players} roomId={roomId!} isHost={player!.isHost} />)
+  }
+
+  if (status === "inputPlayerName" || "joiningTheRoom") {
+    return (<FormInputPlayerName onSubmit={joinRoom} isWaiting={status === "joiningTheRoom"} />)
+  }
+
   return (
     <>
-     <h1 className="text-3xl font-bold underline">Hello World</h1>
-      <p>{`${window.location.origin}?room_id=${roomId}`}<button onClick={() => copyToClipboard(`${window.location.origin}?room_id=${roomId}`)}>Copy</button></p>
-      <h3>参加中のプレイヤー</h3>
-      {players.map((player) => (
-        <p key={player.id}>{player.name}</p>
-      ))}
+      ???
     </>
   )
 }
