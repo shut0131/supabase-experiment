@@ -22,7 +22,7 @@ function App() {
     setStatus("joiningTheRoom")
     const url = new URL(window.location.href)
     const roomIdFromParam = url.searchParams.get('room_id')
-    const isHost = Boolean(roomIdFromParam)
+    const isOwner = !Boolean(roomIdFromParam)
 
     const roomId = roomIdFromParam || crypto.randomUUID()
     setRoomId(roomId)
@@ -30,7 +30,7 @@ function App() {
     const roomOne = client.channel(roomId)
     setChannel(roomOne)
 
-    const player = { id: crypto.randomUUID(), name: playerName, isHost }
+    const player = { id: crypto.randomUUID(), name: playerName, isOwner }
     setPlayer(player)
 
     roomOne
@@ -59,7 +59,7 @@ function App() {
   }
 
   if(status === "waitingOtherPlayers"){
-    return (<WaitingOtherMember players={players} roomId={roomId!} isHost={player!.isHost} />)
+    return (<WaitingOtherMember players={players} roomId={roomId!} />)
   }
 
   if (status === "inputPlayerName" || "joiningTheRoom") {

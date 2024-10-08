@@ -8,10 +8,9 @@ const copyToClipboard = (text: string) => {
 interface Props {
     players: Player[]
     roomId: string
-    isHost: boolean
 }
 
-export const WaitingOtherMember = ({ players, roomId, isHost }: Props) => {
+export const WaitingOtherMember = ({ players, roomId }: Props) => {
     const shareUrl = `${window.location.origin}?room_id=${roomId}`
     return (
         <div className="flex flex-col items-center justify-center">
@@ -24,21 +23,30 @@ export const WaitingOtherMember = ({ players, roomId, isHost }: Props) => {
                                 <td className="text-center">
                                     <div className={`card ${players[rowIndex * 3] ? 'bg-blue-500' : 'bg-gray-300'} text-neutral-content`} >
                                         <div className="card-body">
-                                            <div className="text-center">{players[rowIndex * 3] ? players[rowIndex * 3].name : '空席'}</div>
+                                            <div className="text-center">
+                                                {players[rowIndex * 3] ? players[rowIndex * 3].name : '空席'}
+                                                {players[rowIndex * 3]?.isOwner && <div className="text-sm">（ルームオーナー）</div>}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
                                 <td className="text-center">
                                     <div className={`card ${players[rowIndex * 3 + 1] ? 'bg-blue-500' : 'bg-gray-300'} text-neutral-content`} >
                                         <div className="card-body">
-                                            <p className="text-center">{players[rowIndex * 3 + 1] ? players[rowIndex * 3 + 1].name : '空席'}</p>
+                                            <p className="text-center">
+                                                {players[rowIndex * 3 + 1] ? players[rowIndex * 3 + 1].name : '空席'}
+                                                {players[rowIndex * 3 + 1]?.isOwner && <div className="text-sm">（ルームオーナー）</div>}
+                                            </p>
                                         </div>
                                     </div>
                                 </td>
                                 <td className="text-center">
                                     <div className={`card ${players[rowIndex * 3 + 2] ? 'bg-blue-500' : 'bg-gray-300'} text-neutral-content`} >
                                         <div className="card-body">
-                                            <p className="text-center">{players[rowIndex * 3 + 2] ? players[rowIndex * 3 + 2].name : '空席'}</p>
+                                            <p className="text-center">
+                                                {players[rowIndex * 3 + 2] ? players[rowIndex * 3 + 2].name : '空席'}
+                                                {players[rowIndex * 3 + 2]?.isOwner && <div className="text-sm">（ルームオーナー）</div>}
+                                            </p>
                                         </div>
                                     </div>
                                 </td>
