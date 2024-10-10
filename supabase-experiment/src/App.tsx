@@ -4,8 +4,9 @@ import './App.css'
 import { client } from "./supabse"
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { Player } from './types'
-import { FormInputPlayerName } from './components/FormInputPlayerName'
-import { WaitingOtherMember } from './components/WaitingOtherMember'
+import { FormInputPlayerName } from './components/pages/FormInputPlayerName'
+import { WaitingOtherMember } from './components/pages/WaitingOtherMember'
+import { SelectAnswerPlayer } from './components/pages/SelectAnswerPlayer'
 
 
 
@@ -16,7 +17,7 @@ function App() {
   const [player, setPlayer] = useState<Player | undefined>(undefined)
   const [players, setPlayers] = useState<Player[]>([])
 
-  const [status, setStatus] = useState<"inputPlayerName" | "joiningTheRoom" | "waitingOtherPlayers" >("inputPlayerName")
+  const [status, setStatus] = useState<"inputPlayerName" | "joiningTheRoom" | "waitingOtherPlayers" | "start">("inputPlayerName")
 
   const joinRoom = (playerName: string) => {
     setStatus("joiningTheRoom")
@@ -52,18 +53,31 @@ function App() {
         if (presenceTrackStatus !== "ok") {
           // TODO: handle error
           console.error('Failed to track', presenceTrackStatus)
-        }else{
+        } else {
           setStatus("waitingOtherPlayers")
         }
       })
   }
 
-  if(status === "waitingOtherPlayers"){
-    return (<WaitingOtherMember players={players} roomId={roomId!} />)
+
+  if (status === "inputPlayerName" || status === "joiningTheRoom") {
+    return (<FormInputPlayerName onSubmit={joinRoom} isWaiting={status === "joiningTheRoom"} />)
   }
 
-  if (status === "inputPlayerName" || "joiningTheRoom") {
-    return (<FormInputPlayerName onSubmit={joinRoom} isWaiting={status === "joiningTheRoom"} />)
+  if (!player || !roomId || !channel) {
+    return (
+      <div>
+        ????
+      </div>
+    )
+  }
+
+  if (status === "waitingOtherPlayers" ) {
+    return (<WaitingOtherMember players={players} roomId={roomId!} isOwner={!!player?.isOwner} channel={channel} setStatusToStart={() => setStatus("start")} />)
+  }
+
+  if (status === "start") {
+    return (<SelectAnswerPlayer players={players} isOwner={!!player?.isOwner} channel={channel}/>)
   }
 
   return (
