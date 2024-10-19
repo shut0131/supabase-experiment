@@ -8,8 +8,11 @@ import { FormInputPlayerName } from './components/pages/FormInputPlayerName'
 import { WaitingOtherMember } from './components/pages/WaitingOtherMember'
 import { SelectAnswerPlayer } from './components/pages/SelectAnswerPlayer'
 
-
-
+type Scene = "inputPlayerName" 
+          | "joiningTheRoom" 
+          | "waitingOtherPlayers" 
+          | "selectAnswerPlayer"
+          | "answerQuestion"
 function App() {
 
   const [roomId, setRoomId] = useState<string | undefined>(undefined)
@@ -17,7 +20,9 @@ function App() {
   const [player, setPlayer] = useState<Player | undefined>(undefined)
   const [players, setPlayers] = useState<Player[]>([])
 
-  const [status, setStatus] = useState<"inputPlayerName" | "joiningTheRoom" | "waitingOtherPlayers" | "start">("inputPlayerName")
+  const [status, setStatus] = useState<Scene>("inputPlayerName")
+
+  const [answerPlayerId,setAnswewrPlayerId] = useState<string | undefined>(undefined)
 
   const joinRoom = (playerName: string) => {
     setStatus("joiningTheRoom")
@@ -31,7 +36,7 @@ function App() {
     const roomOne = client.channel(roomId)
     setChannel(roomOne)
 
-    const player = { id: crypto.randomUUID(), name: playerName, isOwner }
+    const player:Player = { id: crypto.randomUUID(), name: playerName, isOwner }
     setPlayer(player)
 
     roomOne
@@ -67,18 +72,30 @@ function App() {
   if (!player || !roomId || !channel) {
     return (
       <div>
-        ????
+        何かがundefinedです
+        @player: {!player}
+        @roomId: {!roomId}
+        @channel: {!channel}
       </div>
     )
   }
 
   if (status === "waitingOtherPlayers" ) {
-    return (<WaitingOtherMember players={players} roomId={roomId!} isOwner={!!player?.isOwner} channel={channel} setStatusToStart={() => setStatus("start")} />)
+    return (<WaitingOtherMember players={players} roomId={roomId!} isOwner={!!player?.isOwner} channel={channel} setStatusToStart={() => setStatus("selectAnswerPlayer")} />)
   }
 
-  if (status === "start") {
-    return (<SelectAnswerPlayer players={players} isOwner={!!player?.isOwner} channel={channel}/>)
+  if (status === "selectAnswerPlayer") {
+    return (<SelectAnswerPlayer players={players} isOwner={player.isOwner} channel={channel} toNextScene={() => setStatus("answerQuestion")} setAnswewrPlayerId={setAnswewrPlayerId} />)
   }
+
+  if(!answerPlayerId){
+    return (
+      <div>
+        answerPlayerIdがundefinedです
+      </div>
+    )
+  }
+
 
   return (
     <>
